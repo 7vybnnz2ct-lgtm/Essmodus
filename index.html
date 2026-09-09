@@ -1,0 +1,1318 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f6f1ea" />
+  <title>Essmodus</title>
+  <style>
+    :root{
+      --bg:#f6f1ea;
+      --card:#fffdf9;
+      --text:#2f2b27;
+      --muted:#746c64;
+      --line:#e7ded3;
+      --accent:#7b6755;
+      --green:#dcefd8;
+      --green-strong:#3f7f49;
+      --yellow:#fff0b8;
+      --yellow-strong:#a87500;
+      --red:#f8d5d0;
+      --red-strong:#b34a42;
+      --shadow:0 10px 30px rgba(68,50,35,.08);
+      --radius:20px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.4}
+    button,select,input{font:inherit}
+    .app{max-width:760px;margin:0 auto;padding:18px 14px 96px}
+    header{padding:10px 4px 18px}
+    h1{margin:0;font-size:clamp(2rem,8vw,3.2rem);letter-spacing:-.05em}
+    header p{margin:6px 0 0;color:var(--muted)}
+    .userbar{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+    .user-actions{display:flex;gap:7px;flex-wrap:wrap}
+    .user-actions button{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 11px;cursor:pointer;font-weight:700}
+    .user-note{grid-column:1/-1;margin:0;color:var(--muted);font-size:.78rem}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
+    .eyebrow{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800}
+    h2{font-size:1.22rem;margin:4px 0 14px}
+    h3{font-size:1rem;margin:0 0 10px}
+    .mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+    .mode{border:2px solid transparent;border-radius:17px;padding:14px 8px;background:#f2eee8;text-align:center;cursor:pointer;min-height:108px;transition:.15s transform,.15s border-color}
+    .mode:active{transform:scale(.98)}
+    .mode .dot{font-size:1.6rem;display:block;margin-bottom:4px}
+    .mode strong{display:block;font-size:.98rem}
+    .mode small{display:block;margin-top:4px;color:var(--muted);font-size:.73rem}
+    .mode[data-mode="green"].selected{background:var(--green);border-color:var(--green-strong)}
+    .mode[data-mode="yellow"].selected{background:var(--yellow);border-color:var(--yellow-strong)}
+    .mode[data-mode="red"].selected{background:var(--red);border-color:var(--red-strong)}
+    .chip-row{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 12px;cursor:pointer;color:var(--text)}
+    .chip.selected{background:var(--text);color:#fff;border-color:var(--text)}
+    .segmented{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;background:#eee6dd;padding:5px;border-radius:14px}
+    .segmented.four{grid-template-columns:repeat(4,1fr)}
+    .segmented button{border:0;background:transparent;padding:10px 6px;border-radius:10px;cursor:pointer}
+    .segmented button.selected{background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.06);font-weight:800}
+    .target-block{display:grid;gap:9px;margin-bottom:12px}
+    .target-label{font-size:.78rem;font-weight:800;color:var(--muted)}
+    .builder-target{grid-column:1/-1;display:grid;gap:9px;margin:2px 0 4px}
+    .suggestions{display:grid;gap:9px;margin-top:12px}
+    .suggestion{border:1px solid var(--line);border-radius:16px;padding:13px;background:#fff;display:flex;gap:10px;align-items:flex-start}
+    .suggestion .icon{font-size:1.4rem;line-height:1}
+    .suggestion strong{display:block}
+    .suggestion small{display:block;color:var(--muted);margin-top:3px}
+    .mode-badge{display:inline-block;margin-top:6px;font-size:.7rem;font-weight:800;border-radius:999px;padding:3px 7px;background:#f2eee8;color:var(--muted)}
+    .suggestion .grow{flex:1}
+    .mini-btn{border:1px solid var(--line);background:#f7f2ec;border-radius:11px;padding:7px 9px;cursor:pointer;font-size:.82rem;white-space:nowrap}
+    .builder{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    label{display:block;font-size:.78rem;font-weight:800;color:var(--muted);margin-bottom:5px}
+    select,input[type="text"],input[type="number"]{width:100%;background:white;border:1px solid var(--line);border-radius:13px;padding:11px 10px;color:var(--text)}
+    input[type="text"]::placeholder{color:#a49a90}
+    .builder-note{grid-column:1/-1;color:var(--muted);font-size:.85rem;margin:0}
+    .primary{width:100%;border:0;border-radius:14px;padding:12px 14px;background:var(--text);color:#fff;font-weight:800;cursor:pointer;margin-top:12px}
+    .plan-day{border-top:1px solid var(--line);padding:13px 0 3px}
+    .plan-day:first-of-type{border-top:0;padding-top:0}
+    .plan-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .plan-head strong{font-size:1.05rem}
+    .plan-head-right{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:.78rem;font-weight:800}
+    .kcal-badge{display:inline-block;margin-top:4px;font-size:.72rem;font-weight:800;border-radius:999px;padding:3px 7px;background:#eee6dd;color:var(--accent)}
+    .kcal-toggle{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:.8rem;font-weight:800;margin:-4px 0 12px}
+    .kcal-toggle input{width:auto;accent-color:var(--accent)}
+    .builder-kcal{grid-column:1/-1;background:#f7f2ec;border:1px solid var(--line);border-radius:13px;padding:10px 12px;font-size:.82rem;color:var(--muted)}
+    .custom-ingredient{grid-column:1/-1;display:grid;grid-template-columns:1fr 130px;gap:10px;padding:12px;border:1px dashed var(--line);border-radius:14px;background:#fff}
+    .custom-ingredient-title{grid-column:1/-1;font-size:.78rem;font-weight:800;color:var(--muted);margin-bottom:-2px}
+    .plan-entry-stack{display:grid;gap:6px}
+    .plan-entry{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#faf7f2;border:1px solid #eee6dd;border-radius:11px;padding:7px 8px}
+    .plan-entry-main{min-width:0;cursor:pointer;border-radius:8px;padding:3px}
+    .plan-entry-main:hover,.plan-entry-main:focus{background:#f2ece4;outline:none}
+    .plan-entry-actions{display:flex;gap:1px;align-items:center}
+    .plan-add-more{border:1px dashed var(--line);background:transparent;border-radius:10px;padding:7px 9px;color:var(--muted);cursor:pointer;text-align:left;font-size:.8rem}
+    .replace-btn{width:100%;border:1px solid var(--accent);background:#fff;border-radius:14px;padding:12px 14px;color:var(--accent);font-weight:800;cursor:pointer;margin-top:8px}
+    .existing-plan-note{background:#f7f2ec;border:1px solid var(--line);border-radius:13px;padding:10px 12px;color:var(--muted);font-size:.82rem;margin:8px 0 12px}
+    .plan-grid{display:grid;gap:7px}
+    .plan-item{display:grid;grid-template-columns:88px 1fr;gap:8px;align-items:start;background:#fff;border:1px solid var(--line);border-radius:13px;padding:9px}
+    .plan-actions{display:flex;gap:2px;align-items:center}
+    .move-btn{border:1px solid var(--line);background:#f7f2ec;border-radius:9px;padding:5px 7px;cursor:pointer;font-size:.78rem}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(47,43,39,.35);display:none;align-items:flex-end;justify-content:center;padding:14px;z-index:30}
+    .modal-backdrop.show{display:flex}
+    .modal{width:min(560px,100%);background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+    .modal h2{margin-top:3px}
+    .modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+    .secondary{border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px;font-weight:800;cursor:pointer}
+    .modal .primary{margin-top:0}
+    .meal-label{font-size:.78rem;font-weight:800;color:var(--muted)}
+    .plan-text{font-size:.9rem;min-width:0}
+    .plan-text.clickable{cursor:pointer;border-radius:9px;padding:5px 7px;margin:-5px -7px;transition:.15s background}
+    .plan-text.clickable:hover,.plan-text.clickable:focus{background:#f7f2ec;outline:none}
+    .plan-empty{color:var(--muted);font-style:italic}
+    .plan-name{font-weight:800}
+    .plan-details{font-size:.76rem;color:var(--muted);margin-top:2px;line-height:1.3}
+    .builder-name{grid-column:1/-1}
+    .icon-btn{border:0;background:transparent;cursor:pointer;font-size:1rem;padding:4px}
+    .footer-note{color:var(--muted);font-size:.8rem;margin-top:10px}
+    .reset{border:1px solid var(--line);background:transparent;border-radius:12px;padding:9px 11px;color:var(--muted);cursor:pointer}
+    .plan-bottom-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:8px}
+    .restore-btn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 11px;color:var(--text);cursor:pointer;display:none}
+    .export-preview{width:100%;max-height:52vh;object-fit:contain;background:var(--bg);border:1px solid var(--line);border-radius:16px;margin-top:10px}
+    .export-help{color:var(--muted);font-size:.82rem;margin:9px 0 0}
+    .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:#2f2b27;color:white;border-radius:999px;padding:10px 14px;opacity:0;pointer-events:none;transition:.2s;z-index:10;font-size:.88rem;box-shadow:var(--shadow)}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    @media (max-width:560px){
+      .app{padding-left:10px;padding-right:10px}
+      .card{padding:15px}
+      .mode{padding:12px 5px;min-height:104px}
+      .mode strong{font-size:.9rem}
+      .builder{grid-template-columns:1fr}
+      .builder-note{grid-column:1}
+      .custom-ingredient{grid-template-columns:1fr}
+      .userbar{grid-template-columns:1fr}
+      .user-actions{display:grid;grid-template-columns:1fr 1fr}
+      .user-actions button:first-child{grid-column:1/-1}
+      .plan-item{grid-template-columns:72px 1fr}
+      .move-btn{font-size:0;width:34px;height:34px}
+      .move-btn::after{content:"↔";font-size:1rem}
+      .plan-bottom-actions{display:grid;grid-template-columns:1fr;gap:8px}
+      .plan-bottom-actions .secondary,.plan-bottom-actions .reset,.plan-bottom-actions .restore-btn{width:100%}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="eyebrow">Dein Essensplan ohne Tracking</div>
+    <h1>Essmodus</h1>
+    <p>Erst schauen, was gerade machbar ist. Dann Essen zusammenstellen.</p>
+  </header>
+
+  <section class="card">
+    <div class="eyebrow">Benutzer</div>
+    <div class="userbar">
+      <div>
+        <label for="userSelect">Aktuelles Profil</label>
+        <select id="userSelect"></select>
+      </div>
+      <div class="user-actions">
+        <button id="addUser">+ Benutzer anlegen</button>
+        <button id="renameUser">Umbenennen</button>
+        <button id="deleteUser">Löschen</button>
+      </div>
+      <p class="user-note">Diese Profile werden lokal in diesem Browser gespeichert. Sie sind noch keine Online-Konten mit Passwort oder Geräte-Synchronisierung.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="eyebrow">1 · Energie</div>
+    <h2>Wie ready bist du gerade?</h2>
+    <div class="mode-grid" id="modeGrid">
+      <button class="mode" data-mode="green"><span class="dot">🟢</span><strong>Grün</strong><small>20–30 Min.<br>Ich kann kochen</small></button>
+      <button class="mode" data-mode="yellow"><span class="dot">🟡</span><strong>Gelb</strong><small>5–15 Min.<br>Bitte einfach</small></button>
+      <button class="mode" data-mode="red"><span class="dot">🔴</span><strong>Rot</strong><small>0–5 Min.<br>Essen. Jetzt.</small></button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="eyebrow">2 · Bedarf</div>
+    <h2>Was klingt gerade gut?</h2>
+    <div class="chip-row" id="needChips">
+      <button class="chip" data-need="any">✨ Egal</button>
+      <button class="chip" data-need="sweet">🍫 Süß</button>
+      <button class="chip" data-need="savory">🧂 Herzhaft</button>
+      <button class="chip" data-need="warm">🔥 Warm</button>
+      <button class="chip" data-need="cold">❄️ Kalt</button>
+      <button class="chip" data-need="filling">🥔 Sättigend</button>
+      <button class="chip" data-need="instant">⚡ Sofort</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="eyebrow">3 · Ziel</div>
+    <h2>Für wann suchst du etwas?</h2>
+    <div class="target-block">
+      <div class="target-label">Tag</div>
+      <div class="segmented" id="dayTabs">
+        <button data-day="0">Tag 1</button>
+        <button data-day="1">Tag 2</button>
+        <button data-day="2">Tag 3</button>
+      </div>
+      <div class="target-label">Mahlzeit</div>
+      <div class="segmented" id="mealTabs">
+        <button data-meal="breakfast">Frühstück</button>
+        <button data-meal="lunch">Mittag</button>
+        <button data-meal="dinner">Abend</button>
+      </div>
+    </div>
+    <div class="suggestions" id="suggestions"></div>
+  </section>
+
+  <section class="card">
+    <div class="eyebrow">Baukasten</div>
+    <h2>Lieber selbst zusammenstellen?</h2>
+    <div class="builder">
+      <div class="builder-target">
+        <div class="target-label">Für welchen Tag?</div>
+        <div class="segmented" id="builderDayTabs">
+          <button data-builder-day="0">Tag 1</button>
+          <button data-builder-day="1">Tag 2</button>
+          <button data-builder-day="2">Tag 3</button>
+        </div>
+        <div class="target-label">Welche Mahlzeit?</div>
+        <div class="segmented four" id="builderMealTabs">
+          <button data-builder-meal="breakfast">Frühstück</button>
+          <button data-builder-meal="lunch">Mittag</button>
+          <button data-builder-meal="dinner">Abend</button>
+          <button data-builder-meal="snack">Snack</button>
+        </div>
+      </div>
+      <div><label for="protein">🥚 Protein</label><select id="protein"></select></div>
+      <div><label for="carb">🍞 Kohlenhydrat</label><select id="carb"></select></div>
+      <div><label for="veg">🥦 Gemüse / Obst</label><select id="veg"></select></div>
+      <div><label for="sauce">🍅 Soße / Geschmack</label><select id="sauce"></select></div>
+      <div><label for="drink">🥛 Milch / Drink</label><select id="drink"></select></div>
+      <div><label for="extra">✨ Extra</label><select id="extra"></select></div>
+      <div class="custom-ingredient">
+        <div class="custom-ingredient-title">➕ Eigene Zutat ergänzen <span style="font-weight:500">(optional)</span></div>
+        <div><label for="customIngredient">Eigene Angabe</label><input id="customIngredient" type="text" maxlength="80" placeholder="z. B. Spezialsoße"></div>
+        <div><label for="customIngredientKcal">ca. kcal</label><input id="customIngredientKcal" type="number" min="0" max="3000" step="5" inputmode="numeric" placeholder="z. B. 80"></div>
+      </div>
+      <div class="builder-name"><label for="mealName">🍽️ Name der Mahlzeit <span style="font-weight:500">(optional)</span></label><input id="mealName" type="text" maxlength="80" placeholder="z. B. Selbstgemachter Döner"></div>
+      <div class="builder-kcal" id="builderKcalPreview">Grobe Schätzung: Wähle Bausteine aus.</div>
+      <p class="builder-note">Du kannst nur einen Namen eintragen, Bausteine auswählen oder beides kombinieren. Über „Eigene Zutat“ kannst du zusätzlich etwas eintragen, das nicht in der Liste steht, samt eigener kcal-Angabe. Beim Hinzufügen entscheidest du, ob es zusätzlich zur bestehenden Mahlzeit kommt oder diese ersetzt.</p>
+    </div>
+    <button class="primary" id="addBuilder">Zum Plan hinzufügen</button>
+  </section>
+
+  <section class="card" id="planCard">
+    <div class="eyebrow">Plan</div>
+    <h2>Meine nächsten 3 Tage</h2>
+    <label class="kcal-toggle"><input type="checkbox" id="showKcal"> Grobe Kalorien anzeigen</label>
+    <div id="plan"></div>
+    <p class="footer-note">Kalorien sind grobe Schätzwerte für deine Portion und können je nach Menge, Marke und Zubereitung deutlich abweichen. Keine Bewertung, kein Konto.</p>
+    <div class="plan-bottom-actions">
+      <button class="secondary" id="downloadPlanImage">Plan als Bild speichern</button>
+      <button class="restore-btn" id="restorePlan">↶ Letzten Plan wiederherstellen</button>
+      <button class="reset" id="resetPlan">Plan leeren</button>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal-backdrop" id="userModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="userModalTitle">
+    <div class="eyebrow">Benutzer</div>
+    <h2 id="userModalTitle">Benutzer anlegen</h2>
+    <label for="userNameInput">Name</label>
+    <input id="userNameInput" type="text" maxlength="40" placeholder="z. B. Vanessa" style="width:100%;background:white;border:1px solid var(--line);border-radius:13px;padding:11px 10px;color:var(--text)">
+    <div class="modal-actions">
+      <button class="secondary" id="cancelUser">Abbrechen</button>
+      <button class="primary" id="confirmUser">Speichern</button>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop" id="addPlanModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="addPlanTitle">
+    <div class="eyebrow">Zum Plan hinzufügen</div>
+    <h2 id="addPlanTitle">Wohin soll die Mahlzeit?</h2>
+    <p class="footer-note" id="addPlanMealName" style="font-size:.92rem;margin:0 0 12px"></p>
+    <div class="target-block">
+      <div class="target-label">Tag</div>
+      <div class="segmented" id="addDayTabs">
+        <button data-add-day="0">Tag 1</button>
+        <button data-add-day="1">Tag 2</button>
+        <button data-add-day="2">Tag 3</button>
+      </div>
+      <div class="target-label">Mahlzeit</div>
+      <div class="segmented four" id="addMealTabs">
+        <button data-add-meal="breakfast">Frühstück</button>
+        <button data-add-meal="lunch">Mittag</button>
+        <button data-add-meal="dinner">Abend</button>
+        <button data-add-meal="snack">Snack</button>
+      </div>
+    </div>
+    <div class="existing-plan-note" id="addPlanExisting" style="display:none"></div>
+    <div class="modal-actions">
+      <button class="secondary" id="cancelAddPlan">Abbrechen</button>
+      <button class="primary" id="confirmAddPlan">Zusätzlich hinzufügen</button>
+    </div>
+    <button class="replace-btn" id="replaceAddPlan" style="display:none">Neue Mahlzeit übernehmen</button>
+  </div>
+</div>
+<div class="modal-backdrop" id="moveModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="moveTitle">
+    <div class="eyebrow">Plan ändern</div>
+    <h2 id="moveTitle">Mahlzeit verschieben</h2>
+    <div class="target-block">
+      <div class="target-label">Ziel-Tag</div>
+      <div class="segmented" id="moveDayTabs">
+        <button data-move-day="0">Tag 1</button>
+        <button data-move-day="1">Tag 2</button>
+        <button data-move-day="2">Tag 3</button>
+      </div>
+      <div class="target-label">Ziel-Mahlzeit</div>
+      <div class="segmented four" id="moveMealTabs">
+        <button data-move-meal="breakfast">Frühstück</button>
+        <button data-move-meal="lunch">Mittag</button>
+        <button data-move-meal="dinner">Abend</button>
+        <button data-move-meal="snack">Snack</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="secondary" id="cancelMove">Abbrechen</button>
+      <button class="primary" id="confirmMove">Verschieben</button>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop" id="editModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+    <div class="eyebrow">Plan ändern</div>
+    <h2 id="editTitle">Mahlzeit bearbeiten</h2>
+    <div>
+      <label for="editMealName">🍽️ Name der Mahlzeit</label>
+      <input id="editMealName" type="text" maxlength="80" placeholder="z. B. Selbstgemachter Döner">
+    </div>
+    <div id="editDetailsWrap" style="margin-top:12px">
+      <label for="editMealDetails">Bausteine / Beschreibung <span style="font-weight:500">(optional)</span></label>
+      <input id="editMealDetails" type="text" maxlength="180" placeholder="z. B. Rinderhack + Brötchen + Salat + Joghurt-Dip">
+    </div>
+    <div style="margin-top:12px">
+      <label for="editMealKcal">ca. kcal für deine Portion <span style="font-weight:500">(optional)</span></label>
+      <input id="editMealKcal" type="number" min="0" max="3000" step="10" inputmode="numeric" placeholder="z. B. 450">
+    </div>
+    <div class="modal-actions">
+      <button class="secondary" id="cancelEdit">Abbrechen</button>
+      <button class="primary" id="confirmEdit">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="exportModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+    <div class="eyebrow">Plan als Bild</div>
+    <h2 id="exportTitle">Vorschau</h2>
+    <img id="exportPreview" class="export-preview" alt="Vorschau deines 3-Tage-Essensplans">
+    <p class="export-help" id="exportHelp">Am Handy kannst du über „Teilen / Speichern“ die Systemfunktion nutzen. Am Computer funktioniert „PNG herunterladen“.</p>
+    <div class="modal-actions">
+      <button class="secondary" id="closeExport">Schließen</button>
+      <button class="secondary" id="sharePlanImage">Teilen / Speichern</button>
+    </div>
+    <button class="primary" id="forceDownloadPlanImage">PNG herunterladen</button>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="clearModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="clearTitle">
+    <div class="eyebrow">Plan leeren</div>
+    <h2 id="clearTitle">Wirklich den ganzen Plan leeren?</h2>
+    <p class="footer-note" style="font-size:.9rem;margin:0">Alle Einträge für Tag 1–3 werden entfernt. Den vorherigen Stand kannst du danach über „Letzten Plan wiederherstellen“ zurückholen.</p>
+    <div class="modal-actions">
+      <button class="secondary" id="cancelClear">Abbrechen</button>
+      <button class="primary" id="confirmClear">Plan wirklich leeren</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const foods = {
+  protein: ["Hüttenkäse","Eier","Skyr","Magerquark","Naturjoghurt / griechischer Joghurt","Frischkäse light","Mozzarella","Feta","Gouda / Schnittkäse","Hähnchenbrust","Hähnchen-/Putenaufschnitt","Rinderhack","Gemischtes Hack","Kochschinken","Lachs","Seelachs / anderer Fisch","Kidneybohnen","Kichererbsen","Tofu","Proteinpulver","Iced-Coffee-Proteinpulver","Thunfisch (selten)","Garnelen (selten)","Linsen (selten)"],
+  carb: ["Cornflakes","Toast","Kartoffeln","Reis","Nudeln","Haferflocken","Müsli","Vollkornbrot","Brötchen","Couscous","Gnocchi","Tortellini","Süßkartoffeln","Wraps (selten)","Knäckebrot (selten)","Vollkornnudeln (selten)","Kartoffelpüree (selten)"],
+  veg: ["Brokkoli","Blumenkohl","Spinat","Rahmspinat","Grüne Bohnen","Gurke","Tomaten","Möhren","Zucchini","Erbsen","Mais","Salat","Kohlrabi","Zwiebeln","TK-Gemüsemischung","Banane","Apfel","Erdbeeren","Himbeeren","Heidelbeeren","TK-Beeren","Weintrauben","Kiwi","Melone","Champignons (selten)","Kürbis (selten)","Lauch (selten)"],
+  sauce: ["Tomatensoße","Passierte Tomaten + Gewürze","Pesto","Joghurt-Kräuter-Dip","Kräuterfrischkäse-Dip","Frischkäse-Sauce","Hummus","Sojasauce","Ketchup","BBQ-Sauce","Sweet-Chili-Sauce","Mayo"],
+  drink: ["Fettarme Milch","Hafermilch","Mandelmilch"],
+  extra: ["Nussmus","Avocado","Käse","Parmesan","Olivenöl","Nüsse","Schokolade","Schoko-Proteinpudding","Kichererbsenwaffeln mit Schokolade","Honig","Marmelade","Nuss-Nougat-Creme","Zimt","Backkakao","Schokodrops","Granola"]
+};
+
+// Sehr grobe Standardportionen für die persönliche Tagesübersicht.
+// Marken, Portionsgrößen und Zubereitung können die Werte deutlich verändern.
+const foodMeta = {
+  "Hüttenkäse":{kcal:200,portion:"200 g"},"Eier":{kcal:160,portion:"2 Stück"},"Skyr":{kcal:160,portion:"250 g"},"Magerquark":{kcal:170,portion:"250 g"},
+  "Naturjoghurt / griechischer Joghurt":{kcal:150,portion:"200 g"},"Frischkäse light":{kcal:60,portion:"40 g"},"Mozzarella":{kcal:150,portion:"60 g"},"Feta":{kcal:160,portion:"60 g"},
+  "Gouda / Schnittkäse":{kcal:140,portion:"40 g"},"Hähnchenbrust":{kcal:250,portion:"150 g"},"Hähnchen-/Putenaufschnitt":{kcal:90,portion:"80 g"},"Rinderhack":{kcal:300,portion:"150 g"},
+  "Gemischtes Hack":{kcal:360,portion:"150 g"},"Kochschinken":{kcal:90,portion:"80 g"},"Lachs":{kcal:310,portion:"150 g"},"Seelachs / anderer Fisch":{kcal:130,portion:"150 g"},
+  "Kidneybohnen":{kcal:165,portion:"150 g"},"Kichererbsen":{kcal:240,portion:"150 g"},"Tofu":{kcal:210,portion:"150 g"},"Proteinpulver":{kcal:115,portion:"30 g"},
+  "Iced-Coffee-Proteinpulver":{kcal:110,portion:"30 g"},"Thunfisch (selten)":{kcal:170,portion:"150 g"},"Garnelen (selten)":{kcal:150,portion:"150 g"},"Linsen (selten)":{kcal:175,portion:"150 g gekocht"},
+  "Cornflakes":{kcal:150,portion:"40 g"},"Toast":{kcal:160,portion:"2 Scheiben"},"Kartoffeln":{kcal:190,portion:"250 g"},"Reis":{kcal:215,portion:"60 g trocken"},
+  "Nudeln":{kcal:250,portion:"70 g trocken"},"Haferflocken":{kcal:150,portion:"40 g"},"Müsli":{kcal:180,portion:"45 g"},"Vollkornbrot":{kcal:200,portion:"2 Scheiben"},
+  "Brötchen":{kcal:170,portion:"1 Stück"},"Couscous":{kcal:220,portion:"60 g trocken"},"Gnocchi":{kcal:375,portion:"250 g"},"Tortellini":{kcal:480,portion:"200 g"},
+  "Süßkartoffeln":{kcal:215,portion:"250 g"},"Wraps (selten)":{kcal:200,portion:"1 großer"},"Knäckebrot (selten)":{kcal:120,portion:"3 Stück"},"Vollkornnudeln (selten)":{kcal:245,portion:"70 g trocken"},"Kartoffelpüree (selten)":{kcal:250,portion:"250 g"},
+  "Brokkoli":{kcal:70,portion:"200 g"},"Blumenkohl":{kcal:50,portion:"200 g"},"Spinat":{kcal:45,portion:"200 g"},"Rahmspinat":{kcal:150,portion:"200 g"},
+  "Grüne Bohnen":{kcal:60,portion:"200 g"},"Gurke":{kcal:30,portion:"200 g"},"Tomaten":{kcal:40,portion:"200 g"},"Möhren":{kcal:60,portion:"150 g"},
+  "Zucchini":{kcal:40,portion:"200 g"},"Erbsen":{kcal:120,portion:"150 g"},"Mais":{kcal:100,portion:"100 g"},"Salat":{kcal:20,portion:"100 g"},
+  "Kohlrabi":{kcal:55,portion:"200 g"},"Zwiebeln":{kcal:20,portion:"50 g"},"TK-Gemüsemischung":{kcal:100,portion:"200 g"},"Banane":{kcal:105,portion:"1 Stück"},
+  "Apfel":{kcal:80,portion:"1 Stück"},"Erdbeeren":{kcal:50,portion:"150 g"},"Himbeeren":{kcal:65,portion:"150 g"},"Heidelbeeren":{kcal:75,portion:"150 g"},
+  "TK-Beeren":{kcal:60,portion:"150 g"},"Weintrauben":{kcal:105,portion:"150 g"},"Kiwi":{kcal:50,portion:"1 Stück"},"Melone":{kcal:70,portion:"200 g"},
+  "Champignons (selten)":{kcal:45,portion:"200 g"},"Kürbis (selten)":{kcal:90,portion:"200 g"},"Lauch (selten)":{kcal:60,portion:"150 g"},
+  "Tomatensoße":{kcal:90,portion:"150 g"},"Passierte Tomaten + Gewürze":{kcal:45,portion:"150 g"},"Pesto":{kcal:100,portion:"20 g"},"Joghurt-Kräuter-Dip":{kcal:50,portion:"60 g"},
+  "Kräuterfrischkäse-Dip":{kcal:90,portion:"50 g"},"Frischkäse-Sauce":{kcal:120,portion:"100 g"},"Hummus":{kcal:100,portion:"40 g"},"Sojasauce":{kcal:15,portion:"1 EL"},
+  "Ketchup":{kcal:30,portion:"30 g"},"BBQ-Sauce":{kcal:45,portion:"30 g"},"Sweet-Chili-Sauce":{kcal:50,portion:"30 g"},"Mayo":{kcal:105,portion:"15 g"},
+  "Fettarme Milch":{kcal:115,portion:"250 ml"},"Hafermilch":{kcal:115,portion:"250 ml"},"Mandelmilch":{kcal:40,portion:"250 ml"},
+  "Nussmus":{kcal:95,portion:"15 g"},"Avocado":{kcal:130,portion:"80 g"},"Käse":{kcal:105,portion:"30 g"},"Parmesan":{kcal:60,portion:"15 g"},
+  "Olivenöl":{kcal:90,portion:"10 g"},"Nüsse":{kcal:120,portion:"20 g"},"Schokolade":{kcal:110,portion:"20 g"},"Schoko-Proteinpudding":{kcal:150,portion:"1 Becher"},
+  "Kichererbsenwaffeln mit Schokolade":{kcal:120,portion:"kleine Portion"},"Honig":{kcal:30,portion:"10 g"},"Marmelade":{kcal:50,portion:"20 g"},"Nuss-Nougat-Creme":{kcal:80,portion:"15 g"},
+  "Zimt":{kcal:0,portion:"etwas"},"Backkakao":{kcal:15,portion:"5 g"},"Schokodrops":{kcal:50,portion:"10 g"},"Granola":{kcal:120,portion:"25 g"}
+};
+
+const ideaKcal = {
+  "Skyr + Cornflakes + Banane":415,"Schoko-Proteinpudding + Banane":255,"Hüttenkäse + Toast":360,"Toast + Käse + Gurke":295,"Skyr + Banane + Nussmus":360,
+  "Schoko-Proteinpudding + Kichererbsenwaffeln":270,"Toast + Avocado + Hüttenkäse":490,"Iced Coffee mit Mandelmilch":150,"Proteinshake mit Milch oder Pflanzendrink":220,
+  "2 Eier + Toast":320,"Skyr + Cornflakes + TK-Beeren":370,"Käse-Rührei + Toast":410,"Haferflocken + Skyr + Banane":415,"Hüttenkäse + Avocado + Toast + Gurke":520,
+  "Skyr + Cornflakes + ein paar Schokodrops":360,"Cornflakes + Milch/Pflanzendrink + Skyr":425,"Iced Coffee mit Mandelmilch + Banane":255,"Eier + Toast + Avocado + Gurke":450,
+  "Skyr-Bowl mit Cornflakes, Banane & Nussmus":510,"Rührei mit Brokkoli + Käse + Toast":480,"Bananen-Hafer-Pancakes mit Skyr":450,"Kartoffel-Ei-Pfanne mit Spinat":450,
+  "Warme Haferflocken mit Banane, Skyr & Nussmus":510,"Hüttenkäse + Toast + Gurke":390,"Käsetoast + Rohkost":330,"2 gekochte Eier + Toast + Gurke":350,
+  "Hüttenkäse + Avocado + Toast":490,"Proteinpudding + Banane + Kichererbsenwaffeln":375,"Reis + TK-Brokkoli + Ei + Sojasauce":460,"Nudeln + Pesto + Brokkoli + Parmesan":480,
+  "Nudeln + Rahmspinat + geriebener Käse":505,"Kartoffeln + Hüttenkäse + Gurke":420,"Nudeln + Tomatensoße + Mozzarella":490,"Kartoffeln + Brokkoli + Spiegelei":420,
+  "Rührei + Spinat + Käsetoast":440,"Gnocchi + Brokkoli + Frischkäse-Sauce":565,"Reis + Hüttenkäse + Brokkoli + Sweet-Chili":535,"Reis + Hähnchen + Brokkoli + Sojasauce":550,
+  "Ofenkartoffeln + Hüttenkäse + Brokkoli":460,"Nudeln + Hähnchen + Brokkoli in Frischkäse-Sauce":690,"Kartoffel-Brokkoli-Pfanne + Ei + Käse":525,
+  "Gnocchi mit Tomatensoße, Spinat & Mozzarella":660,"Reis-Bowl mit Hähnchen, Avocado, Gurke & Dip":670,"Couscous-Bowl mit Kichererbsen, Gurke, Feta & Dip":700,
+  "Nudeln + Tomatensoße + Käse":445,"Nudeln + Pesto + Parmesan":410,"Toast-Abend mit Käse, Ei & Rohkost":430,"Tortellini + Tomatensoße":570,
+  "Mikrowellenreis + TK-Brokkoli + Ei":470,"Brotzeit mit Toast, Käse, Hüttenkäse, Ei & Gurke":620,"Reis + Hähnchen + TK-Brokkoli + Sojasauce":560,
+  "Nudeln + Tomatensoße + Käse + Brokkoli":515,"Ofenkartoffeln + Fischstäbchen/Hähnchen + Brokkoli":600,"Rührei + Kartoffeln + Spinat":450,
+  "Schnelle Hack-Nudel-Pfanne mit Tomatensoße":650,"Tortellini + Brokkoli + Tomaten-Frischkäse-Sauce":700,"Kartoffelspalten + Hüttenkäse-Dip + Gemüse":480,
+  "Hähnchen-Kartoffel-Brokkoli-Blech":610,"Pasta mit Hack-Tomatensoße + Gemüse":680,"Nudelauflauf mit Blumenkohl/Brokkoli & Käse":650,"Hähnchen-Reis-Brokkoli-Auflauf":650,
+  "Ofenkartoffeln mit Hüttenkäse, Käse & Brokkoli":590,"Hack-Kartoffel-Brokkoli-Pfanne":650,"Lachs/Seelachs + Kartoffeln + Blumenkohl":600,"Cremige Brokkoli-Hähnchen-Pasta":690,
+  "Kartoffel-Blumenkohl-Auflauf mit Käse":600,"Gnocchi-Auflauf mit Tomatensoße, Brokkoli & Mozzarella":720
+};
+
+const ideas = [
+  // FRÜHSTÜCK · ROT
+  {m:"breakfast",mode:"red",needs:["sweet","cold","instant"],icon:"🥣",name:"Skyr + Cornflakes + Banane",note:"Schnell, süß und mit Proteinbasis."},
+  {m:"breakfast",mode:"red",needs:["sweet","instant"],icon:"🍫",name:"Schoko-Proteinpudding + Banane",note:"Wenn süß gerade wirklich wichtig ist."},
+  {m:"breakfast",mode:"red",needs:["savory","instant"],icon:"🍞",name:"Hüttenkäse + Toast",note:"Fast ohne Vorbereitung."},
+  {m:"breakfast",mode:"red",needs:["savory","instant"],icon:"🧀",name:"Toast + Käse + Gurke",note:"Einfach belegen und essen."},
+  {m:"breakfast",mode:"red",needs:["sweet","cold","instant"],icon:"🍌",name:"Skyr + Banane + Nussmus",note:"Drei Zutaten, trotzdem befriedigend."},
+  {m:"breakfast",mode:"red",needs:["sweet","instant"],icon:"🧇",name:"Schoko-Proteinpudding + Kichererbsenwaffeln",note:"Knusprig + schokoladig, wenn Dopamin gefragt ist."},
+  {m:"breakfast",mode:"red",needs:["savory","cold","instant"],icon:"🥑",name:"Toast + Avocado + Hüttenkäse",note:"Ohne Kochen, herzhaft und cremig."},
+  {m:"breakfast",mode:"red",needs:["sweet","cold","instant"],icon:"🧋",name:"Iced Coffee mit Mandelmilch",note:"Iced-Coffee-Proteinpulver + Mandelmilch – dein schnelles Frühstück ohne Kochaufwand."},
+  {m:"breakfast",mode:"red",needs:["sweet","cold","instant"],icon:"🥛",name:"Proteinshake mit Milch oder Pflanzendrink",note:"Proteinpulver + fettarme Milch, Hafermilch oder Mandelmilch."},
+
+  // FRÜHSTÜCK · GELB
+  {m:"breakfast",mode:"yellow",needs:["sweet","cold","filling"],icon:"🥜",name:"Skyr + Banane + Nussmus",note:"Cremig, süß und sättigend."},
+  {m:"breakfast",mode:"yellow",needs:["savory","warm"],icon:"🍳",name:"2 Eier + Toast",note:"Kurz warm machen, sonst simpel."},
+  {m:"breakfast",mode:"yellow",needs:["sweet","cold"],icon:"🥣",name:"Skyr + Cornflakes + TK-Beeren",note:"Knusprig, kalt und schnell."},
+  {m:"breakfast",mode:"yellow",needs:["savory","warm","filling"],icon:"🧀",name:"Käse-Rührei + Toast",note:"Wenig Aufwand, warm und herzhaft."},
+  {m:"breakfast",mode:"yellow",needs:["sweet","filling"],icon:"🍌",name:"Haferflocken + Skyr + Banane",note:"Einfach verrühren oder kurz ziehen lassen."},
+  {m:"breakfast",mode:"yellow",needs:["savory","cold"],icon:"🥒",name:"Hüttenkäse + Avocado + Toast + Gurke",note:"Zusammenstellen statt richtig kochen."},
+  {m:"breakfast",mode:"yellow",needs:["sweet","instant"],icon:"🍫",name:"Skyr + Cornflakes + ein paar Schokodrops",note:"Bewusst süß eingebaut statt verboten."},
+  {m:"breakfast",mode:"yellow",needs:["sweet","cold","filling"],icon:"🥣",name:"Cornflakes + Milch/Pflanzendrink + Skyr",note:"Knusprig und schnell; Skyr ergänzt die Proteinbasis."},
+  {m:"breakfast",mode:"yellow",needs:["sweet","cold","instant"],icon:"🧋",name:"Iced Coffee mit Mandelmilch + Banane",note:"Wenn der Drink allein zu wenig ist, kommt unkompliziert eine Banane dazu."},
+
+  // FRÜHSTÜCK · GRÜN
+  {m:"breakfast",mode:"green",needs:["savory","warm","filling"],icon:"🥑",name:"Eier + Toast + Avocado + Gurke",note:"Mehr Komponenten, aber unkompliziert."},
+  {m:"breakfast",mode:"green",needs:["sweet","cold"],icon:"🍌",name:"Skyr-Bowl mit Cornflakes, Banane & Nussmus",note:"Viele Favoriten in einer Bowl."},
+  {m:"breakfast",mode:"green",needs:["savory","warm"],icon:"🥦",name:"Rührei mit Brokkoli + Käse + Toast",note:"Herzhaftes Frühstück mit grünem Gemüse."},
+  {m:"breakfast",mode:"green",needs:["sweet","warm"],icon:"🥞",name:"Bananen-Hafer-Pancakes mit Skyr",note:"Für Tage, an denen Frühstück ein kleines Projekt sein darf."},
+  {m:"breakfast",mode:"green",needs:["savory","warm","filling"],icon:"🥔",name:"Kartoffel-Ei-Pfanne mit Spinat",note:"Auch gut, wenn du morgens richtig herzhaft möchtest."},
+  {m:"breakfast",mode:"green",needs:["sweet","filling"],icon:"🥣",name:"Warme Haferflocken mit Banane, Skyr & Nussmus",note:"Warm, cremig und variierbar."},
+
+  // MITTAG · ROT
+  {m:"lunch",mode:"red",needs:["savory","cold","instant"],icon:"🧀",name:"Hüttenkäse + Toast + Gurke",note:"Zusammenstellen statt kochen."},
+  {m:"lunch",mode:"red",needs:["savory","instant"],icon:"🍞",name:"Käsetoast + Rohkost",note:"Schnell und geschmacklich klar."},
+  {m:"lunch",mode:"red",needs:["sweet","instant"],icon:"🥣",name:"Skyr + Banane + Nussmus",note:"Frühstück darf Mittagessen sein."},
+  {m:"lunch",mode:"red",needs:["savory","instant"],icon:"🥚",name:"2 gekochte Eier + Toast + Gurke",note:"Ideal, wenn Eier schon vorbereitet sind."},
+  {m:"lunch",mode:"red",needs:["savory","cold","instant"],icon:"🥑",name:"Hüttenkäse + Avocado + Toast",note:"Schnell, cremig, kein Herd."},
+  {m:"lunch",mode:"red",needs:["savory","warm","instant"],icon:"🍝",name:"Reste vom Abendessen aufwärmen",note:"Eine richtige Mahlzeit darf auch nur Mikrowelle bedeuten."},
+  {m:"lunch",mode:"red",needs:["sweet","instant"],icon:"🍫",name:"Proteinpudding + Banane + Kichererbsenwaffeln",note:"Wenn süß gerade realistischer ist als Kochen."},
+
+  // MITTAG · GELB
+  {m:"lunch",mode:"yellow",needs:["savory","warm","filling"],icon:"🍚",name:"Reis + TK-Brokkoli + Ei + Sojasauce",note:"Wenig Schritte, richtiges warmes Essen."},
+  {m:"lunch",mode:"yellow",needs:["savory","warm"],icon:"🍝",name:"Nudeln + Pesto + Brokkoli + Parmesan",note:"Schnell, vertraut und variierbar."},
+  {m:"lunch",mode:"yellow",needs:["savory","warm","filling"],icon:"🌿",name:"Nudeln + Rahmspinat + geriebener Käse",note:"Ein schneller Favorit mit wenig Aufwand."},
+  {m:"lunch",mode:"yellow",needs:["savory","filling"],icon:"🥔",name:"Kartoffeln + Hüttenkäse + Gurke",note:"Einfach, sättigend und gut kombinierbar."},
+  {m:"lunch",mode:"yellow",needs:["savory","warm"],icon:"🍅",name:"Nudeln + Tomatensoße + Mozzarella",note:"Sehr wenige Entscheidungen nötig."},
+  {m:"lunch",mode:"yellow",needs:["savory","warm","filling"],icon:"🥦",name:"Kartoffeln + Brokkoli + Spiegelei",note:"Lieblingszutaten, ohne kompliziertes Rezept."},
+  {m:"lunch",mode:"yellow",needs:["savory","warm"],icon:"🍳",name:"Rührei + Spinat + Käsetoast",note:"Eine Pfanne, schnell fertig."},
+  {m:"lunch",mode:"yellow",needs:["savory","warm"],icon:"🥟",name:"Gnocchi + Brokkoli + Frischkäse-Sauce",note:"Cremig und in einer Pfanne machbar."},
+  {m:"lunch",mode:"yellow",needs:["savory","warm","filling"],icon:"🍚",name:"Reis + Hüttenkäse + Brokkoli + Sweet-Chili",note:"Ungewöhnlich, aber schnell und sehr variierbar."},
+
+  // MITTAG · GRÜN
+  {m:"lunch",mode:"green",needs:["savory","warm","filling"],icon:"🍗",name:"Reis + Hähnchen + Brokkoli + Sojasauce",note:"Eine stabile Bowl-Basis."},
+  {m:"lunch",mode:"green",needs:["savory","warm","filling"],icon:"🥔",name:"Ofenkartoffeln + Hüttenkäse + Brokkoli",note:"Mehr Zeit, aber einfache Grundzutaten."},
+  {m:"lunch",mode:"green",needs:["savory","warm"],icon:"🍝",name:"Nudeln + Hähnchen + Brokkoli in Frischkäse-Sauce",note:"Cremig, sättigend und gut vorzubereiten."},
+  {m:"lunch",mode:"green",needs:["savory","warm","filling"],icon:"🥦",name:"Kartoffel-Brokkoli-Pfanne + Ei + Käse",note:"Eine Pfanne und viele Favoriten."},
+  {m:"lunch",mode:"green",needs:["savory","warm"],icon:"🍅",name:"Gnocchi mit Tomatensoße, Spinat & Mozzarella",note:"Einfach, aber etwas mehr Kochgefühl."},
+  {m:"lunch",mode:"green",needs:["savory","warm","filling"],icon:"🍚",name:"Reis-Bowl mit Hähnchen, Avocado, Gurke & Dip",note:"Viele Komponenten zum Zusammenpuzzeln."},
+  {m:"lunch",mode:"green",needs:["savory","warm"],icon:"🥣",name:"Couscous-Bowl mit Kichererbsen, Gurke, Feta & Dip",note:"Für Abwechslung außerhalb deiner Standardfavoriten."},
+
+  // ABEND · ROT
+  {m:"dinner",mode:"red",needs:["savory","warm","instant"],icon:"🍝",name:"Nudeln + Tomatensoße + Käse",note:"Familientauglich, TK-Gemüse kann einfach dazu."},
+  {m:"dinner",mode:"red",needs:["savory","warm","instant"],icon:"🌿",name:"Nudeln + Pesto + Parmesan",note:"Sehr wenig Arbeit, vertrauter Geschmack."},
+  {m:"dinner",mode:"red",needs:["savory","instant"],icon:"🍞",name:"Toast-Abend mit Käse, Ei & Rohkost",note:"Kein gemeinsames Kochprojekt nötig."},
+  {m:"dinner",mode:"red",needs:["savory","warm"],icon:"🥟",name:"Tortellini + Tomatensoße",note:"Minimaler Aufwand für vier."},
+  {m:"dinner",mode:"red",needs:["savory","warm","filling"],icon:"🍚",name:"Mikrowellenreis + TK-Brokkoli + Ei",note:"Auch als Familienessen darf es maximal einfach sein."},
+  {m:"dinner",mode:"red",needs:["savory","instant"],icon:"🧺",name:"Resteabend",note:"Alles Verwertbare auf den Tisch, ohne neues Gericht."},
+  {m:"dinner",mode:"red",needs:["savory","instant"],icon:"🧀",name:"Brotzeit mit Toast, Käse, Hüttenkäse, Ei & Gurke",note:"Jeder nimmt, was passt."},
+
+  // ABEND · GELB
+  {m:"dinner",mode:"yellow",needs:["savory","warm","filling"],icon:"🥦",name:"Reis + Hähnchen + TK-Brokkoli + Sojasauce",note:"Einfach skalierbar für die Familie."},
+  {m:"dinner",mode:"yellow",needs:["savory","warm"],icon:"🍝",name:"Nudeln + Tomatensoße + Käse + Brokkoli",note:"Kinder können Komponenten getrennt bekommen."},
+  {m:"dinner",mode:"yellow",needs:["savory","warm","filling"],icon:"🌿",name:"Nudeln + Rahmspinat + geriebener Käse",note:"Schnell gemacht und leicht für vier Personen zu skalieren."},
+  {m:"dinner",mode:"yellow",needs:["savory","warm","filling"],icon:"🥔",name:"Ofenkartoffeln + Fischstäbchen/Hähnchen + Brokkoli",note:"Wenig aktive Kochzeit."},
+  {m:"dinner",mode:"yellow",needs:["savory","warm"],icon:"🥟",name:"Gnocchi + Brokkoli + Frischkäse-Sauce",note:"Eine Pfanne, cremig, familienfreundlich."},
+  {m:"dinner",mode:"yellow",needs:["savory","warm"],icon:"🍳",name:"Rührei + Kartoffeln + Spinat",note:"Schnelles warmes Abendessen ohne großes Rezept."},
+  {m:"dinner",mode:"yellow",needs:["savory","warm","filling"],icon:"🍝",name:"Schnelle Hack-Nudel-Pfanne mit Tomatensoße",note:"Ein Topf oder eine Pfanne reicht."},
+  {m:"dinner",mode:"yellow",needs:["savory","warm"],icon:"🥦",name:"Tortellini + Brokkoli + Tomaten-Frischkäse-Sauce",note:"Fertigprodukt als Basis, Gemüse dazu."},
+  {m:"dinner",mode:"yellow",needs:["savory","warm","filling"],icon:"🥔",name:"Kartoffelspalten + Hüttenkäse-Dip + Gemüse",note:"Für die Kinder gut in Einzelteilen servierbar."},
+
+  // ABEND · GRÜN
+  {m:"dinner",mode:"green",needs:["savory","warm","filling"],icon:"🍗",name:"Hähnchen-Kartoffel-Brokkoli-Blech",note:"Ein Blech, familienfreundlich, gut variierbar."},
+  {m:"dinner",mode:"green",needs:["savory","warm","filling"],icon:"🍝",name:"Pasta mit Hack-Tomatensoße + Gemüse",note:"Klassische Familienbasis."},
+  {m:"dinner",mode:"green",needs:["savory","warm"],icon:"🧀",name:"Nudelauflauf mit Blumenkohl/Brokkoli & Käse",note:"Passt gut zu deinen Favoriten."},
+  {m:"dinner",mode:"green",needs:["savory","warm","filling"],icon:"🍚",name:"Hähnchen-Reis-Brokkoli-Auflauf",note:"Gut vorzubereiten und für vier einfach zu portionieren."},
+  {m:"dinner",mode:"green",needs:["savory","warm"],icon:"🥔",name:"Ofenkartoffeln mit Hüttenkäse, Käse & Brokkoli",note:"Toppings können für jeden anders sein."},
+  {m:"dinner",mode:"green",needs:["savory","warm","filling"],icon:"🍲",name:"Hack-Kartoffel-Brokkoli-Pfanne",note:"Deftig, unkompliziert und familientauglich."},
+  {m:"dinner",mode:"green",needs:["savory","warm"],icon:"🐟",name:"Lachs/Seelachs + Kartoffeln + Blumenkohl",note:"Ein klassischer Teller mit wenig Schnickschnack."},
+  {m:"dinner",mode:"green",needs:["savory","warm"],icon:"🍝",name:"Cremige Brokkoli-Hähnchen-Pasta",note:"Mit Frischkäse-Sauce oder leichter Käse-Sauce."},
+  {m:"dinner",mode:"green",needs:["savory","warm","filling"],icon:"🥘",name:"Kartoffel-Blumenkohl-Auflauf mit Käse",note:"Vegetarische Familienoption mit deinen Favoriten."},
+  {m:"dinner",mode:"green",needs:["savory","warm"],icon:"🍅",name:"Gnocchi-Auflauf mit Tomatensoße, Brokkoli & Mozzarella",note:"Etwas mehr Aufwand, aber sehr unkomplizierte Zutaten."}
+];
+
+const USERS_KEY="essmodus-users";
+const ACTIVE_USER_KEY="essmodus-active-user";
+const LEGACY_STATE_KEY="essmodus-state";
+let userModalMode="add";
+
+function emptyDay(){return {breakfast:[],lunch:[],dinner:[],snack:[]};}
+function makeEmptyState(){
+  return {
+    mode:"yellow", need:"any", meal:"breakfast", targetDay:0, builderDay:0, builderMeal:"breakfast", showKcal:true,
+    plan:[emptyDay(),emptyDay(),emptyDay()]
+  };
+}
+function newUserId(){return 'u-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7)}
+function readUsers(){
+  try{const v=JSON.parse(localStorage.getItem(USERS_KEY)||'[]');return Array.isArray(v)?v:[];}catch(e){return [];}
+}
+let users=readUsers();
+if(!users.length){
+  const first={id:newUserId(),name:'Mein Profil'};
+  users=[first];
+  localStorage.setItem(USERS_KEY,JSON.stringify(users));
+  const legacy=localStorage.getItem(LEGACY_STATE_KEY);
+  if(legacy) localStorage.setItem(`essmodus-state-${first.id}`,legacy);
+  localStorage.setItem(ACTIVE_USER_KEY,first.id);
+}
+let activeUserId=localStorage.getItem(ACTIVE_USER_KEY);
+if(!users.some(u=>u.id===activeUserId)){activeUserId=users[0].id;localStorage.setItem(ACTIVE_USER_KEY,activeUserId);}
+function stateStorageKey(userId=activeUserId){return `essmodus-state-${userId}`}
+function backupStorageKey(userId=activeUserId){return `essmodus-last-plan-${userId}`}
+function normalizeEntry(value){
+  if(!value) return null;
+  if(typeof value==='string') return {name:value,details:'',kcal:null};
+  if(typeof value==='object' && !Array.isArray(value)) return {...value};
+  return null;
+}
+function normalizeMealEntries(value){
+  if(Array.isArray(value)) return value.map(normalizeEntry).filter(Boolean);
+  const one=normalizeEntry(value);
+  return one ? [one] : [];
+}
+function normalizeState(v){
+  const base=makeEmptyState();
+  const out=v && typeof v==='object' ? {...base,...v} : base;
+  const source=Array.isArray(out.plan)&&out.plan.length===3 ? out.plan : base.plan;
+  out.plan=source.map(day=>({
+    breakfast:normalizeMealEntries(day?.breakfast),
+    lunch:normalizeMealEntries(day?.lunch),
+    dinner:normalizeMealEntries(day?.dinner),
+    snack:normalizeMealEntries(day?.snack)
+  }));
+  out.targetDay ??= 0;
+  out.builderDay ??= out.targetDay;
+  out.builderMeal ??= out.meal || 'breakfast';
+  return out;
+}
+function loadState(userId=activeUserId){
+  try{return normalizeState(JSON.parse(localStorage.getItem(stateStorageKey(userId))||'null'));}
+  catch(e){return makeEmptyState();}
+}
+let state=loadState();
+let moveState={fromDay:null,fromMeal:null,fromIndex:null,toDay:0,toMeal:"breakfast"};
+let addPlanState={text:"",day:0,meal:"breakfast"};
+let editState={day:null,meal:null,index:null};
+let exportState={dataUrl:null,file:null};
+
+function save(){localStorage.setItem(stateStorageKey(),JSON.stringify(state));}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600)}
+
+function renderUsers(){
+  const sel=document.getElementById('userSelect');
+  if(!sel) return;
+  sel.innerHTML=users.map(u=>`<option value="${escapeHTML(u.id)}">${escapeHTML(u.name)}</option>`).join('');
+  sel.value=activeUserId;
+}
+function switchUser(id){
+  if(!users.some(u=>u.id===id)) return;
+  save();
+  activeUserId=id;
+  localStorage.setItem(ACTIVE_USER_KEY,id);
+  state=loadState(id);
+  renderUsers();
+  renderControls();
+  renderSuggestions();
+  renderPlan();
+  toast(`Profil gewechselt: ${users.find(u=>u.id===id)?.name||''}`);
+}
+function openUserModal(mode){
+  userModalMode=mode;
+  const active=users.find(u=>u.id===activeUserId);
+  document.getElementById('userModalTitle').textContent=mode==='rename'?'Benutzer umbenennen':'Benutzer anlegen';
+  document.getElementById('userNameInput').value=mode==='rename'?(active?.name||''):'';
+  const m=document.getElementById('userModal');
+  m.classList.add('show');m.setAttribute('aria-hidden','false');
+  setTimeout(()=>document.getElementById('userNameInput').focus(),30);
+}
+function closeUserModal(){
+  const m=document.getElementById('userModal');
+  m.classList.remove('show');m.setAttribute('aria-hidden','true');
+}
+function confirmUserModal(){
+  const name=document.getElementById('userNameInput').value.trim();
+  if(!name){toast('Bitte einen Namen eingeben');return;}
+  if(userModalMode==='rename'){
+    const u=users.find(u=>u.id===activeUserId);
+    if(u) u.name=name;
+    localStorage.setItem(USERS_KEY,JSON.stringify(users));
+    renderUsers();closeUserModal();toast('Benutzer umbenannt');
+    return;
+  }
+  const user={id:newUserId(),name};
+  users.push(user);
+  localStorage.setItem(USERS_KEY,JSON.stringify(users));
+  localStorage.setItem(stateStorageKey(user.id),JSON.stringify(makeEmptyState()));
+  closeUserModal();
+  switchUser(user.id);
+  toast(`Benutzer „${name}“ angelegt`);
+}
+function deleteActiveUser(){
+  if(users.length<=1){toast('Mindestens ein Benutzer muss bleiben');return;}
+  const active=users.find(u=>u.id===activeUserId);
+  if(!confirm(`Benutzer „${active?.name||''}“ und dessen lokalen Plan wirklich löschen?`)) return;
+  localStorage.removeItem(stateStorageKey(activeUserId));
+  localStorage.removeItem(backupStorageKey(activeUserId));
+  users=users.filter(u=>u.id!==activeUserId);
+  localStorage.setItem(USERS_KEY,JSON.stringify(users));
+  activeUserId=users[0].id;
+  localStorage.setItem(ACTIVE_USER_KEY,activeUserId);
+  state=loadState();
+  renderUsers();renderControls();renderSuggestions();renderPlan();
+  toast('Benutzer gelöscht');
+}
+
+function fillSelect(id, items){
+  const el=document.getElementById(id);
+  el.innerHTML='<option value="">Bitte wählen</option>'+items.map(x=>{
+    const meta=foodMeta[x];
+    const label=meta ? `${x} · ca. ${meta.kcal} kcal / ${meta.portion}` : x;
+    return `<option value="${escapeHTML(x)}">${escapeHTML(label)}</option>`;
+  }).join('');
+}
+fillSelect("protein",foods.protein);fillSelect("carb",foods.carb);fillSelect("veg",foods.veg);fillSelect("sauce",foods.sauce);fillSelect("drink",foods.drink);fillSelect("extra",foods.extra);
+
+function renderControls(){
+  document.querySelectorAll(".mode").forEach(b=>b.classList.toggle("selected",b.dataset.mode===state.mode));
+  document.querySelectorAll(".chip").forEach(b=>b.classList.toggle("selected",b.dataset.need===state.need));
+  document.querySelectorAll("#dayTabs button").forEach(b=>b.classList.toggle("selected",Number(b.dataset.day)===state.targetDay));
+  document.querySelectorAll("#mealTabs button").forEach(b=>b.classList.toggle("selected",b.dataset.meal===state.meal));
+  document.querySelectorAll("#builderDayTabs button").forEach(b=>b.classList.toggle("selected",Number(b.dataset.builderDay)===state.builderDay));
+  document.querySelectorAll("#builderMealTabs button").forEach(b=>b.classList.toggle("selected",b.dataset.builderMeal===state.builderMeal));
+  const kcalToggle=document.getElementById("showKcal");
+  if(kcalToggle) kcalToggle.checked=state.showKcal!==false;
+}
+
+function compatibleMode(ideaMode){
+  const rank={red:0,yellow:1,green:2};
+  return rank[ideaMode] <= rank[state.mode];
+}
+
+function renderSuggestions(){
+  const box=document.getElementById("suggestions");
+  let found=ideas.filter(x=>x.m===state.meal && compatibleMode(x.mode));
+  if(state.need!=="any"){
+    const strict=found.filter(x=>x.needs.includes(state.need));
+    if(strict.length) found=strict;
+  }
+  const rank={red:0,yellow:1,green:2};
+  found.sort((a,b)=>{
+    const aExact=a.mode===state.mode?0:1, bExact=b.mode===state.mode?0:1;
+    if(aExact!==bExact) return aExact-bExact;
+    return rank[b.mode]-rank[a.mode];
+  });
+  found=found.slice(0,9);
+  const modeText={red:"🔴 Rot",yellow:"🟡 Gelb",green:"🟢 Grün"};
+  box.innerHTML=found.length ? found.map((x,i)=>`
+    <div class="suggestion">
+      <div class="icon">${x.icon}</div>
+      <div class="grow"><strong>${x.name}</strong><small>${x.note}</small><span class="mode-badge">${modeText[x.mode]}</span>${state.showKcal!==false && ideaKcal[x.name] ? `<span class="kcal-badge">ca. ${ideaKcal[x.name]} kcal</span>` : ''}</div>
+      <button class="mini-btn" data-add="${encodeURIComponent(x.name)}">+ Plan</button>
+    </div>`).join('') : '<div class="suggestion"><div class="grow"><strong>Noch keine passende Idee.</strong><small>Probier „Egal“ oder einen anderen Modus.</small></div></div>';
+  box.querySelectorAll("[data-add]").forEach(btn=>btn.onclick=()=>openAddPlan(decodeURIComponent(btn.dataset.add)));
+}
+
+function escapeHTML(value){
+  return String(value).replace(/[&<>"']/g, ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[ch]));
+}
+function entryName(entry){
+  if(!entry) return "";
+  return typeof entry === "object" ? (entry.name || entry.details || "") : String(entry);
+}
+function entryDetails(entry){
+  if(!entry || typeof entry !== "object") return "";
+  return entry.details || "";
+}
+function estimateDetailsKcal(details){
+  if(!details) return null;
+  const parts=String(details).split(" + ").map(x=>x.trim()).filter(Boolean);
+  if(!parts.length) return null;
+  let total=0;
+  for(const part of parts){
+    const meta=foodMeta[part];
+    if(!meta) return null;
+    total+=meta.kcal;
+  }
+  return total;
+}
+function entryKcal(entry){
+  if(!entry) return null;
+  if(typeof entry === "object" && Number.isFinite(Number(entry.kcal)) && Number(entry.kcal)>0) return Math.round(Number(entry.kcal));
+  const name=entryName(entry);
+  const details=entryDetails(entry);
+  if(ideaKcal[name]) return ideaKcal[name];
+  const byDetails=estimateDetailsKcal(details);
+  if(byDetails) return byDetails;
+  return estimateDetailsKcal(name);
+}
+function entryIsIncomplete(entry){
+  return !!(entry && typeof entry==='object' && entry.kcalIncomplete);
+}
+function getEntries(day,meal){
+  const value=state.plan?.[day]?.[meal];
+  return Array.isArray(value) ? value : normalizeMealEntries(value);
+}
+function builderEstimateInfo(){
+  const ids=["protein","carb","veg","sauce","drink","extra"];
+  const vals=ids.map(id=>document.getElementById(id)?.value).filter(Boolean);
+  let total=vals.reduce((sum,v)=>sum+(foodMeta[v]?.kcal||0),0);
+  const customName=document.getElementById('customIngredient')?.value.trim() || '';
+  const customRaw=document.getElementById('customIngredientKcal')?.value || '';
+  let incomplete=false;
+  if(customName){
+    if(customRaw!=='' && Number.isFinite(Number(customRaw))) total+=Math.max(0,Math.round(Number(customRaw)));
+    else incomplete=true;
+  }
+  return {total: total || null, incomplete, vals, customName, customKcal: customRaw===''?null:Math.max(0,Math.round(Number(customRaw)))};
+}
+function builderEstimate(){return builderEstimateInfo().total;}
+function updateBuilderKcalPreview(){
+  const el=document.getElementById("builderKcalPreview");
+  if(!el) return;
+  const info=builderEstimateInfo();
+  if(!info.total && !info.customName){el.textContent='Grobe Schätzung: Wähle Bausteine aus.';return;}
+  if(info.incomplete){
+    el.textContent=`Bisher ca. ${info.total||0} kcal + eigene Zutat ohne kcal-Angabe.`;
+  }else{
+    el.textContent=`Grobe Schätzung deiner Portion: ca. ${info.total||0} kcal`;
+  }
+}
+function dayKcalInfo(day){
+  let total=0, unknown=0;
+  ["breakfast","lunch","dinner","snack"].forEach(meal=>{
+    const entries=Array.isArray(day?.[meal]) ? day[meal] : normalizeMealEntries(day?.[meal]);
+    entries.forEach(entry=>{
+      const kcal=entryKcal(entry);
+      if(kcal) total+=kcal;
+      if(!kcal || entryIsIncomplete(entry)) unknown++;
+    });
+  });
+  return {total,unknown};
+}
+function entryImageText(entry){
+  if(!entry) return "";
+  let text;
+  if(typeof entry === "object"){
+    const name=entry.name || "";
+    const details=entry.details || "";
+    text=name && details ? `${name} — ${details}` : (name || details || "");
+  }else text=String(entry);
+  const kcal=entryKcal(entry);
+  return state.showKcal!==false && kcal ? `${text} · ca. ${kcal} kcal` : text;
+}
+function mealImageText(entries){
+  const list=Array.isArray(entries) ? entries : normalizeMealEntries(entries);
+  if(!list.length) return "Noch offen";
+  return list.map(entryImageText).filter(Boolean).join(" + ");
+}
+function openEdit(day, meal, index=null){
+  const entries=getEntries(day,meal);
+  const entry=index===null ? null : entries[index];
+  editState={day,meal,index};
+  document.getElementById("editTitle").textContent=entry ? `${mealLabel(meal)} bearbeiten` : `${mealLabel(meal)} eintragen`;
+  document.getElementById("editMealName").value=entryName(entry);
+  document.getElementById("editMealDetails").value=entryDetails(entry);
+  document.getElementById("editMealKcal").value=entryKcal(entry) || "";
+  const modal=document.getElementById("editModal");
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden","false");
+  setTimeout(()=>document.getElementById("editMealName").focus(),50);
+}
+function closeEdit(){
+  const modal=document.getElementById("editModal");
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden","true");
+  editState={day:null,meal:null,index:null};
+}
+function confirmEdit(){
+  const {day,meal,index}=editState;
+  if(day===null || !meal) return;
+  const entries=getEntries(day,meal);
+  const original=index===null ? null : entries[index];
+  const name=document.getElementById("editMealName").value.trim();
+  const details=document.getElementById("editMealDetails").value.trim();
+  const kcalRaw=document.getElementById("editMealKcal").value;
+  const kcal=kcalRaw ? Math.max(0,Math.round(Number(kcalRaw))) : null;
+  if(!name && !details){toast("Bitte gib einen Namen oder eine Beschreibung ein");return;}
+  const finalName=name || details || entryName(original);
+  const finalDetails=details || (original ? entryDetails(original) : "");
+  const autoKcal=kcal || ideaKcal[finalName] || estimateDetailsKcal(finalDetails) || null;
+  const entry={name:finalName,details:finalDetails,kcal:autoKcal,kcalIncomplete:false};
+  if(index===null) entries.push(entry); else entries[index]=entry;
+  state.plan[day][meal]=entries;
+  save();
+  renderPlan();
+  closeEdit();
+  toast(index===null ? `${mealLabel(meal)} ergänzt` : "Eintrag gespeichert");
+}
+
+function mealLabel(key){return {breakfast:"Frühstück",lunch:"Mittag",dinner:"Abend",snack:"Snacks"}[key] || key;}
+function openAddPlan(textOrEntry,day=state.targetDay,meal=state.meal){
+  let entry;
+  if(typeof textOrEntry==='string') entry={name:textOrEntry,details:"",kcal:ideaKcal[textOrEntry] || null,kcalIncomplete:false};
+  else entry=normalizeEntry(textOrEntry) || {name:'',details:'',kcal:null,kcalIncomplete:false};
+  addPlanState={text:entry,day,meal};
+  document.getElementById("addPlanMealName").textContent=state.showKcal!==false && entryKcal(entry) ? `${entryName(entry)} · ca. ${entryKcal(entry)} kcal` : entryName(entry);
+  renderAddPlanControls();
+  const modal=document.getElementById("addPlanModal");
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden","false");
+}
+function closeAddPlan(){
+  const modal=document.getElementById("addPlanModal");
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden","true");
+}
+function renderAddPlanControls(){
+  document.querySelectorAll("#addDayTabs button").forEach(b=>b.classList.toggle("selected",Number(b.dataset.addDay)===addPlanState.day));
+  document.querySelectorAll("#addMealTabs button").forEach(b=>b.classList.toggle("selected",b.dataset.addMeal===addPlanState.meal));
+  const existing=getEntries(addPlanState.day,addPlanState.meal);
+  const note=document.getElementById('addPlanExisting');
+  const addBtn=document.getElementById('confirmAddPlan');
+  const replaceBtn=document.getElementById('replaceAddPlan');
+  if(existing.length){
+    note.style.display='';
+    note.innerHTML=`Bei <strong>Tag ${addPlanState.day+1} · ${mealLabel(addPlanState.meal)}</strong> steht bereits: ${existing.map(x=>escapeHTML(entryName(x))).join(' + ')}`;
+    addBtn.textContent='Zusätzlich hinzufügen';
+    replaceBtn.style.display='';
+  }else{
+    note.style.display='none';
+    addBtn.textContent='In den Plan eintragen';
+    replaceBtn.style.display='none';
+  }
+}
+function confirmAddPlan(mode='append'){
+  if(!addPlanState.text) return;
+  const entries=getEntries(addPlanState.day,addPlanState.meal);
+  if(mode==='replace') state.plan[addPlanState.day][addPlanState.meal]=[addPlanState.text];
+  else state.plan[addPlanState.day][addPlanState.meal]=[...entries,addPlanState.text];
+  state.targetDay=addPlanState.day;
+  if(addPlanState.meal!=='snack') state.meal=addPlanState.meal;
+  save();renderControls();renderSuggestions();renderPlan();closeAddPlan();
+  toast(mode==='replace' ? 'Neue Mahlzeit übernommen' : `${mealLabel(addPlanState.meal)} ergänzt`);
+}
+function openMove(day,meal,index){
+  moveState={fromDay:day,fromMeal:meal,fromIndex:index,toDay:day,toMeal:meal};
+  renderMoveControls();
+  const modal=document.getElementById("moveModal");
+  modal.classList.add("show");modal.setAttribute("aria-hidden","false");
+}
+function closeMove(){const modal=document.getElementById("moveModal");modal.classList.remove("show");modal.setAttribute("aria-hidden","true");}
+function renderMoveControls(){
+  document.querySelectorAll("#moveDayTabs button").forEach(b=>b.classList.toggle("selected",Number(b.dataset.moveDay)===moveState.toDay));
+  document.querySelectorAll("#moveMealTabs button").forEach(b=>b.classList.toggle("selected",b.dataset.moveMeal===moveState.toMeal));
+}
+function confirmMove(){
+  const {fromDay,fromMeal,fromIndex,toDay,toMeal}=moveState;
+  if(fromDay===null || fromIndex===null) return;
+  if(fromDay===toDay && fromMeal===toMeal){closeMove();return;}
+  const source=getEntries(fromDay,fromMeal);
+  const moving=source[fromIndex];
+  if(!moving){closeMove();return;}
+  source.splice(fromIndex,1);
+  const target=getEntries(toDay,toMeal);
+  target.push(moving);
+  state.plan[fromDay][fromMeal]=source;
+  state.plan[toDay][toMeal]=target;
+  save();renderPlan();closeMove();toast("Eintrag verschoben");
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+  const words=String(text).split(/\s+/);
+  let line='';
+  const lines=[];
+  for(const word of words){
+    const test=line ? line + ' ' + word : word;
+    if(ctx.measureText(test).width > maxWidth && line){
+      lines.push(line);
+      line=word;
+    }else{
+      line=test;
+    }
+  }
+  if(line) lines.push(line);
+  lines.forEach((ln,i)=>ctx.fillText(ln,x,y + i*lineHeight));
+  return lines.length * lineHeight;
+}
+
+function downloadPlanAsImage(){
+  const canvas=document.createElement('canvas');
+  const ratio=Math.max(window.devicePixelRatio || 1, 2);
+  const width=1080;
+  const dayBoxWidth=width - 120;
+  const mealBoxWidth=dayBoxWidth - 40;
+  const mealTextWidth=mealBoxWidth - 160;
+  const dayHeights=state.plan.map((day)=>{
+    let h=92;
+    ['breakfast','lunch','dinner','snack'].forEach((meal)=>{
+      const text=mealImageText(day[meal]);
+      const charsPerLine=Math.max(18, Math.floor(mealTextWidth / 14));
+      const lines=Math.max(1, Math.ceil(text.length / charsPerLine));
+      const textHeight=Math.max(24, lines * 22);
+      h += Math.max(70, textHeight + 24) + 12;
+    });
+    return h + 18;
+  });
+  const height=Math.max(900, 180 + dayHeights.reduce((a,b)=>a+b,0) + 40);
+  canvas.width=width * ratio;
+  canvas.height=height * ratio;
+  canvas.style.width=width+'px';
+  canvas.style.height=height+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(ratio, ratio);
+
+  // background
+  ctx.fillStyle='#f6f1ea';
+  ctx.fillRect(0,0,width,height);
+
+  // header
+  ctx.fillStyle='#746c64';
+  ctx.font='700 20px Inter, Arial, sans-serif';
+  ctx.fillText('Dein Essensplan ohne Tracking', 60, 58);
+  ctx.fillStyle='#2f2b27';
+  ctx.font='800 52px Inter, Arial, sans-serif';
+  ctx.fillText('Essmodus', 60, 112);
+  ctx.font='400 24px Inter, Arial, sans-serif';
+  ctx.fillText('Meine nächsten 3 Tage', 60, 146);
+
+  let y=180;
+  const meals=['breakfast','lunch','dinner','snack'];
+  const mealNames={breakfast:'Frühstück', lunch:'Mittag', dinner:'Abend', snack:'Snacks'};
+
+  state.plan.forEach((day, index)=>{
+    const cardX=40, cardY=y, cardW=width-80;
+    const cardH=dayHeights[index];
+
+    ctx.fillStyle='#fffdf9';
+    roundRect(ctx, cardX, cardY, cardW, cardH, 28, true, false);
+    ctx.strokeStyle='#e7ded3';
+    ctx.lineWidth=2;
+    roundRect(ctx, cardX, cardY, cardW, cardH, 28, false, true);
+
+    ctx.fillStyle='#2f2b27';
+    ctx.font='800 30px Inter, Arial, sans-serif';
+    ctx.fillText(`Tag ${index+1}`, cardX+26, cardY+44);
+    const info=dayKcalInfo(day);
+    if(state.showKcal!==false && info.total){
+      ctx.fillStyle='#746c64';
+      ctx.font='700 18px Inter, Arial, sans-serif';
+      const totalLabel=`ca. ${info.total} kcal${info.unknown ? ' + offen' : ''}`;
+      ctx.fillText(totalLabel, cardX+cardW-250, cardY+42);
+    }else if(index===0){
+      ctx.fillStyle='#746c64';
+      ctx.font='700 18px Inter, Arial, sans-serif';
+      ctx.fillText('Heute', cardX+cardW-90, cardY+42);
+    }
+
+    let innerY=cardY+66;
+    meals.forEach((meal)=>{
+      const text=mealImageText(day[meal]);
+      const boxX=cardX+20, boxY=innerY, boxW=cardW-40;
+      ctx.fillStyle='#ffffff';
+      roundRect(ctx, boxX, boxY, boxW, 0, 18, false, false);
+      // calculate text height with actual metrics
+      ctx.font='500 24px Inter, Arial, sans-serif';
+      const words=String(text).split(/\s+/);
+      let line=''; const lines=[];
+      for(const word of words){
+        const test=line ? line+' '+word : word;
+        if(ctx.measureText(test).width > mealTextWidth && line){ lines.push(line); line=word; }
+        else { line=test; }
+      }
+      if(line) lines.push(line);
+      const textHeight=Math.max(24, lines.length * 22);
+      const boxH=Math.max(74, textHeight + 28);
+      ctx.fillStyle='#ffffff';
+      roundRect(ctx, boxX, boxY, boxW, boxH, 18, true, false);
+      ctx.strokeStyle='#e7ded3';
+      ctx.lineWidth=1.5;
+      roundRect(ctx, boxX, boxY, boxW, boxH, 18, false, true);
+
+      ctx.fillStyle='#746c64';
+      ctx.font='800 18px Inter, Arial, sans-serif';
+      ctx.fillText(mealNames[meal], boxX+18, boxY+28);
+
+      ctx.fillStyle='#2f2b27';
+      ctx.font='500 24px Inter, Arial, sans-serif';
+      lines.forEach((ln,i)=>ctx.fillText(ln, boxX+122, boxY+30 + i*22));
+
+      innerY += boxH + 12;
+    });
+
+    y += cardH + 18;
+  });
+
+  ctx.fillStyle='#746c64';
+  ctx.font='400 18px Inter, Arial, sans-serif';
+  ctx.fillText('Erstellt mit Essmodus', 60, height - 24);
+
+  const dataUrl=canvas.toDataURL('image/png');
+  exportState.dataUrl=dataUrl;
+  exportState.file=null;
+  try{
+    const base64=dataUrl.split(',')[1];
+    const binary=atob(base64);
+    const bytes=new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+    exportState.file=new File([bytes], 'essmodus-plan.png', {type:'image/png'});
+  }catch(e){
+    exportState.file=null;
+  }
+  document.getElementById('exportPreview').src=dataUrl;
+  const shareBtn=document.getElementById('sharePlanImage');
+  const canShare=!!(exportState.file && navigator.share && (!navigator.canShare || navigator.canShare({files:[exportState.file]})));
+  shareBtn.style.display=canShare ? '' : 'none';
+  document.getElementById('exportHelp').textContent=canShare
+    ? 'Am Handy kannst du „Teilen / Speichern“ verwenden. Am Computer kannst du das PNG direkt herunterladen.'
+    : 'Du kannst das PNG direkt herunterladen. Auf dem Handy kannst du das Vorschaubild zusätzlich gedrückt halten und speichern, falls dein Browser das anbietet.';
+  const modal=document.getElementById('exportModal');
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden','false');
+}
+
+function closeExport(){
+  const modal=document.getElementById('exportModal');
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden','true');
+}
+
+function forceDownloadPlanImage(){
+  if(!exportState.dataUrl){downloadPlanAsImage();return;}
+  const a=document.createElement('a');
+  a.href=exportState.dataUrl;
+  a.download='essmodus-plan.png';
+  a.rel='noopener';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  toast('PNG-Download gestartet');
+}
+
+function sharePlanImage(){
+  if(!(exportState.file && navigator.share)){
+    forceDownloadPlanImage();
+    return;
+  }
+  try{
+    const sharePromise=navigator.share({files:[exportState.file],title:'Essmodus – 3-Tage-Plan'});
+    if(sharePromise && sharePromise.catch){
+      sharePromise.catch(err=>{
+        if(err && err.name!=='AbortError'){toast('Teilen nicht möglich – nutze PNG herunterladen');}
+      });
+    }
+  }catch(e){
+    toast('Teilen nicht möglich – nutze PNG herunterladen');
+  }
+}
+
+function roundRect(ctx, x, y, width, height, radius, fill, stroke){
+  const h = height || 0;
+  const r = Math.min(radius, width/2, h/2 || radius);
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+width, y, x+width, y+h, r);
+  ctx.arcTo(x+width, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+width, y, r);
+  ctx.closePath();
+  if(fill) ctx.fill();
+  if(stroke) ctx.stroke();
+}
+
+function emptyPlan(){
+  return [emptyDay(),emptyDay(),emptyDay()];
+}
+
+function hasPlanContent(plan){
+  return Array.isArray(plan) && plan.some(day=>day && ['breakfast','lunch','dinner','snack'].some(meal=>normalizeMealEntries(day[meal]).length>0));
+}
+
+function getLastPlanBackup(){
+  try{return JSON.parse(localStorage.getItem(backupStorageKey()) || 'null');}catch(e){return null;}
+}
+
+function updateRestoreButton(){
+  const btn=document.getElementById('restorePlan');
+  if(btn) btn.style.display=hasPlanContent(getLastPlanBackup()) ? '' : 'none';
+}
+
+function openClearModal(){
+  if(!hasPlanContent(state.plan)){toast('Der Plan ist schon leer');return;}
+  const modal=document.getElementById('clearModal');
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden','false');
+}
+
+function closeClearModal(){
+  const modal=document.getElementById('clearModal');
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden','true');
+}
+
+function clearPlanConfirmed(){
+  localStorage.setItem(backupStorageKey(),JSON.stringify(state.plan));
+  state.plan=emptyPlan();
+  save();
+  renderPlan();
+  closeClearModal();
+  updateRestoreButton();
+  toast('Plan geleert – Wiederherstellen ist möglich');
+}
+
+function restoreLastPlan(){
+  const backup=getLastPlanBackup();
+  if(!hasPlanContent(backup)){toast('Kein vorheriger Plan gespeichert');updateRestoreButton();return;}
+  if(hasPlanContent(state.plan)){
+    const current=JSON.stringify(state.plan);
+    state.plan=normalizeState({plan:backup}).plan;
+    localStorage.setItem(backupStorageKey(),current);
+  }else{
+    state.plan=normalizeState({plan:backup}).plan;
+    localStorage.removeItem(backupStorageKey());
+  }
+  save();
+  renderPlan();
+  updateRestoreButton();
+  toast('Letzten Plan wiederhergestellt');
+}
+
+function renderPlan(){
+  const el=document.getElementById("plan");
+  el.innerHTML=state.plan.map((d,di)=>{
+    const dayInfo=dayKcalInfo(d);
+    const totalText=state.showKcal!==false && dayInfo.total ? `ca. ${dayInfo.total} kcal${dayInfo.unknown ? ` + ${dayInfo.unknown} offen` : ''}` : '';
+    return `
+    <div class="plan-day">
+      <div class="plan-head"><strong>Tag ${di+1}</strong><div class="plan-head-right"><span>${totalText}</span><span>${di===0?'Heute':''}</span></div></div>
+      <div class="plan-grid">
+        ${["breakfast","lunch","dinner","snack"].map(k=>{
+          const entries=Array.isArray(d[k]) ? d[k] : normalizeMealEntries(d[k]);
+          const entryHtml=entries.map((entry,idx)=>{
+            const kcal=entryKcal(entry);
+            return `
+              <div class="plan-entry">
+                <div class="plan-entry-main" role="button" tabindex="0" data-edit-item="${di}-${k}-${idx}" aria-label="${mealLabel(k)} bearbeiten">
+                  <div class="plan-name">${escapeHTML(entryName(entry))}</div>
+                  ${entryDetails(entry) ? `<div class="plan-details">${escapeHTML(entryDetails(entry))}</div>` : ''}
+                  ${state.showKcal!==false && kcal ? `<span class="kcal-badge">ca. ${kcal} kcal${entryIsIncomplete(entry)?' + offen':''}</span>` : ''}
+                </div>
+                <div class="plan-entry-actions">
+                  <button class="icon-btn" aria-label="Bearbeiten" title="Bearbeiten" data-edit-button="${di}-${k}-${idx}">✎</button>
+                  <button class="move-btn" aria-label="Verschieben" title="Verschieben" data-move-item="${di}-${k}-${idx}">Verschieben</button>
+                  <button class="icon-btn" aria-label="Löschen" title="Löschen" data-clear-item="${di}-${k}-${idx}">✕</button>
+                </div>
+              </div>`;
+          }).join('');
+          const addLabel=entries.length ? '+ Weiteren Eintrag hinzufügen' : (k==='snack' ? '+ Snack eintragen' : '+ Mahlzeit eintragen');
+          return `
+          <div class="plan-item">
+            <div class="meal-label">${mealLabel(k)}</div>
+            <div class="plan-entry-stack">
+              ${entryHtml}
+              <button class="plan-add-more" data-add-entry="${di}-${k}">${addLabel}</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  el.querySelectorAll("[data-clear-item]").forEach(btn=>btn.onclick=()=>{
+    const [di,k,idx]=btn.dataset.clearItem.split('-');
+    const entries=getEntries(Number(di),k);
+    entries.splice(Number(idx),1);
+    state.plan[Number(di)][k]=entries;
+    save();renderPlan();
+  });
+  el.querySelectorAll("[data-edit-item]").forEach(field=>{
+    field.onclick=()=>{
+      const [di,k,idx]=field.dataset.editItem.split('-');
+      openEdit(Number(di),k,Number(idx));
+    };
+    field.onkeydown=e=>{
+      if(e.key==="Enter" || e.key===" "){
+        e.preventDefault();
+        const [di,k,idx]=field.dataset.editItem.split('-');
+        openEdit(Number(di),k,Number(idx));
+      }
+    };
+  });
+  el.querySelectorAll("[data-edit-button]").forEach(btn=>btn.onclick=()=>{
+    const [di,k,idx]=btn.dataset.editButton.split('-');openEdit(Number(di),k,Number(idx));
+  });
+  el.querySelectorAll("[data-add-entry]").forEach(btn=>btn.onclick=()=>{
+    const [di,k]=btn.dataset.addEntry.split('-');openEdit(Number(di),k,null);
+  });
+  el.querySelectorAll("[data-move-item]").forEach(btn=>btn.onclick=()=>{
+    const [di,k,idx]=btn.dataset.moveItem.split('-');openMove(Number(di),k,Number(idx));
+  });
+  updateRestoreButton();
+}
+
+function initEvents(){
+  document.getElementById("userSelect").onchange=e=>switchUser(e.target.value);
+  document.getElementById("addUser").onclick=()=>openUserModal('add');
+  document.getElementById("renameUser").onclick=()=>openUserModal('rename');
+  document.getElementById("deleteUser").onclick=deleteActiveUser;
+  document.getElementById("cancelUser").onclick=closeUserModal;
+  document.getElementById("confirmUser").onclick=confirmUserModal;
+  document.getElementById("userModal").onclick=e=>{if(e.target.id==="userModal") closeUserModal();};
+  document.getElementById("userNameInput").addEventListener("keydown",e=>{if(e.key==="Enter") confirmUserModal();});
+  document.getElementById("modeGrid").onclick=e=>{const b=e.target.closest(".mode");if(!b)return;state.mode=b.dataset.mode;save();renderControls();renderSuggestions();};
+  document.getElementById("needChips").onclick=e=>{const b=e.target.closest(".chip");if(!b)return;state.need=b.dataset.need;save();renderControls();renderSuggestions();};
+  document.getElementById("showKcal").onchange=e=>{state.showKcal=e.target.checked;save();renderPlan();renderSuggestions();};
+  document.getElementById("dayTabs").onclick=e=>{const b=e.target.closest("button");if(!b)return;state.targetDay=Number(b.dataset.day);save();renderControls();};
+  document.getElementById("mealTabs").onclick=e=>{const b=e.target.closest("button");if(!b)return;state.meal=b.dataset.meal;save();renderControls();renderSuggestions();};
+  document.getElementById("addDayTabs").onclick=e=>{const b=e.target.closest("button");if(!b)return;addPlanState.day=Number(b.dataset.addDay);renderAddPlanControls();};
+  document.getElementById("addMealTabs").onclick=e=>{const b=e.target.closest("button");if(!b)return;addPlanState.meal=b.dataset.addMeal;renderAddPlanControls();};
+  document.getElementById("cancelAddPlan").onclick=closeAddPlan;
+  document.getElementById("confirmAddPlan").onclick=()=>confirmAddPlan("append");
+  document.getElementById("replaceAddPlan").onclick=()=>confirmAddPlan("replace");
+  document.getElementById("addPlanModal").onclick=e=>{if(e.target.id==="addPlanModal") closeAddPlan();};
+  document.getElementById("builderDayTabs").onclick=e=>{const b=e.target.closest("button");if(!b)return;state.builderDay=Number(b.dataset.builderDay);save();renderControls();};
+  document.getElementById("builderMealTabs").onclick=e=>{const b=e.target.closest("button");if(!b)return;state.builderMeal=b.dataset.builderMeal;save();renderControls();};
+  ["protein","carb","veg","sauce","drink","extra"].forEach(id=>document.getElementById(id).addEventListener("change",updateBuilderKcalPreview));
+  ["customIngredient","customIngredientKcal"].forEach(id=>document.getElementById(id).addEventListener("input",updateBuilderKcalPreview));
+  updateBuilderKcalPreview();
+  document.getElementById("addBuilder").onclick=()=>{
+    const vals=["protein","carb","veg","sauce","drink","extra"].map(id=>document.getElementById(id).value).filter(Boolean);
+    const mealName=document.getElementById("mealName").value.trim();
+    const customIngredient=document.getElementById("customIngredient").value.trim();
+    const info=builderEstimateInfo();
+    const allParts=[...vals];
+    if(customIngredient) allParts.push(customIngredient);
+    if(!allParts.length && !mealName){toast("Trag einen Namen ein oder wähle mindestens einen Baustein");return;}
+    const entry={
+      name:mealName || allParts.join(" + "),
+      details:mealName && allParts.length ? allParts.join(" + ") : "",
+      kcal:info.total || null,
+      kcalIncomplete:info.incomplete
+    };
+    openAddPlan(entry,state.builderDay,state.builderMeal);
+    document.getElementById("mealName").value="";
+    document.getElementById("customIngredient").value="";
+    document.getElementById("customIngredientKcal").value="";
+    ["protein","carb","veg","sauce","drink","extra"].forEach(id=>document.getElementById(id).value="");
+    updateBuilderKcalPreview();
+  };
+  document.getElementById("downloadPlanImage").onclick=downloadPlanAsImage;
+  document.getElementById("forceDownloadPlanImage").onclick=forceDownloadPlanImage;
+  document.getElementById("sharePlanImage").onclick=sharePlanImage;
+  document.getElementById("closeExport").onclick=closeExport;
+  document.getElementById("exportModal").onclick=e=>{if(e.target.id==="exportModal") closeExport();};
+  document.getElementById("resetPlan").onclick=openClearModal;
+  document.getElementById("restorePlan").onclick=restoreLastPlan;
+  document.getElementById("cancelClear").onclick=closeClearModal;
+  document.getElementById("confirmClear").onclick=clearPlanConfirmed;
+  document.getElementById("clearModal").onclick=e=>{if(e.target.id==="clearModal") closeClearModal();};
+  document.getElementById("cancelEdit").onclick=closeEdit;
+  document.getElementById("confirmEdit").onclick=confirmEdit;
+  document.getElementById("editModal").onclick=e=>{if(e.target.id==="editModal") closeEdit();};
+  document.getElementById("editMealName").addEventListener("keydown",e=>{if(e.key==="Enter") confirmEdit();});
+  document.getElementById("editMealDetails").addEventListener("keydown",e=>{if(e.key==="Enter") confirmEdit();});
+  document.getElementById("editMealKcal").addEventListener("keydown",e=>{if(e.key==="Enter") confirmEdit();});
+  document.getElementById("moveDayTabs").onclick=e=>{const b=e.target.closest("button");if(!b)return;moveState.toDay=Number(b.dataset.moveDay);renderMoveControls();};
+  document.getElementById("moveMealTabs").onclick=e=>{const b=e.target.closest("button");if(!b)return;moveState.toMeal=b.dataset.moveMeal;renderMoveControls();};
+  document.getElementById("cancelMove").onclick=closeMove;
+  document.getElementById("confirmMove").onclick=confirmMove;
+  document.getElementById("moveModal").onclick=e=>{if(e.target.id==="moveModal") closeMove();};
+}
+
+
+renderUsers();renderControls();renderSuggestions();renderPlan();initEvents();
+</script>
+</body>
+</html>
